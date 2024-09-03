@@ -19,6 +19,36 @@ let frame = 0;
 let score = 0;
 let gameOver = false;
 
+document.getElementById("startButton").addEventListener("click", function() {
+    document.getElementById("startScreen").style.display = "none";
+    canvas.style.display = "block";
+    resetGame();
+    gameLoop();
+});
+
+document.getElementById("leaderboardButton").addEventListener("click", function() {
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("leaderboardScreen").style.display = "block";
+    loadLeaderboard();
+});
+
+document.getElementById("backButton").addEventListener("click", function() {
+    document.getElementById("leaderboardScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "block";
+});
+
+document.getElementById("restartButton").addEventListener("click", function() {
+    document.getElementById("gameOverScreen").style.display = "none";
+    resetGame();
+    canvas.style.display = "block";
+    gameLoop();
+});
+
+document.getElementById("backToMenuButton").addEventListener("click", function() {
+    document.getElementById("gameOverScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "block";
+});
+
 document.addEventListener("keydown", function(event) {
     if (event.code === "Space" && !gameOver) {
         bird.velocity = bird.lift;
@@ -29,14 +59,6 @@ canvas.addEventListener("touchstart", function(event) {
     if (!gameOver) {
         bird.velocity = bird.lift;
     }
-});
-
-document.getElementById("startButton").addEventListener("click", function() {
-    document.getElementById("startScreen").style.display = "none";
-    canvas.style.display = "block";
-    resetGame();  // Сбрасываем игру при каждом запуске
-    gameLoop();
-    loadLeaderboard(); // Загружаем лидерборд при старте игры
 });
 
 function drawBird() {
@@ -92,15 +114,10 @@ function checkCollision() {
 
 function endGame() {
     gameOver = true;
-    ctx.fillStyle = "red";
-    ctx.font = "30px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
-    ctx.font = "20px Arial";
-    ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
-
+    canvas.style.display = "none";
+    document.getElementById("finalScore").textContent = "Score: " + score;
     saveScore(score);
-    loadLeaderboard(); // Обновляем лидерборд после завершения игры
+    document.getElementById("gameOverScreen").style.display = "block";
 }
 
 function resetGame() {
@@ -132,7 +149,7 @@ function saveScore(score) {
 function loadLeaderboard() {
     let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
     const leaderboardElement = document.getElementById('leaderboard');
-    leaderboardElement.innerHTML = '<h2>Leaderboard</h2>';
+    leaderboardElement.innerHTML = '';
     leaderboard.forEach((score, index) => {
         const entryElement = document.createElement('div');
         entryElement.textContent = `${index + 1}. Score: ${score}`;

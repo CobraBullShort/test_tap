@@ -9,9 +9,24 @@
 <body>
     <div id="startScreen">
         <button id="startButton">Start Game</button>
+        <button id="leaderboardButton">View Leaderboard</button>
     </div>
+    
     <canvas id="gameCanvas" style="display: none;"></canvas>
-    <div id="leaderboard"></div>
+
+    <div id="leaderboardScreen" style="display: none;">
+        <h2>Leaderboard</h2>
+        <div id="leaderboard"></div>
+        <button id="backButton">Back to Menu</button>
+    </div>
+    
+    <div id="gameOverScreen" style="display: none;">
+        <h2>Game Over</h2>
+        <p id="finalScore"></p>
+        <button id="restartButton">Restart Game</button>
+        <button id="backToMenuButton">Back to Menu</button>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
