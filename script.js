@@ -24,6 +24,12 @@ document.addEventListener("keydown", function(event) {
     }
 });
 
+document.getElementById("startButton").addEventListener("click", function() {
+    document.getElementById("startScreen").style.display = "none";
+    canvas.style.display = "block";
+    gameLoop();
+});
+
 function drawBird() {
     ctx.fillStyle = "yellow";
     ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
@@ -81,6 +87,8 @@ function resetGame() {
     pipes = [];
     frame = 0;
     score = 0;
+    document.getElementById("startScreen").style.display = "block";
+    canvas.style.display = "none";
 }
 
 function updateBird() {
@@ -103,7 +111,7 @@ function gameLoop() {
     ctx.fillText("Score: " + score, 10, 20);
 
     frame++;
-    requestAnimationFrame(gameLoop);
+    if (document.getElementById("startScreen").style.display === "none") {
+        requestAnimationFrame(gameLoop);
+    }
 }
-
-gameLoop();
