@@ -9,8 +9,8 @@ let bird = {
     y: 150,
     width: 20,
     height: 20,
-    gravity: 0.54,
-    lift: -9,
+    gravity: 0.54, // Уменьшили гравитацию на 10%
+    lift: -9,      // Уменьшили силу подъема на 10%
     velocity: 0
 };
 
@@ -22,6 +22,11 @@ document.addEventListener("keydown", function(event) {
     if (event.code === "Space") {
         bird.velocity = bird.lift;
     }
+});
+
+// Обработка касания на экране для мобильных устройств
+canvas.addEventListener("touchstart", function(event) {
+    bird.velocity = bird.lift;
 });
 
 document.getElementById("startButton").addEventListener("click", function() {
@@ -45,7 +50,7 @@ function drawPipes() {
 
 function updatePipes() {
     if (frame % 90 === 0) {
-        let gap = 105;
+        let gap = 105; // Увеличили расстояние между трубами на 5% (было 100)
         let topHeight = Math.floor(Math.random() * (canvas.height - gap));
         pipes.push({
             x: canvas.width,
