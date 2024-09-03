@@ -45,7 +45,7 @@ function drawPipes() {
 
 function updatePipes() {
     if (frame % 90 === 0) {
-        let gap = 100;
+        let gap = 105;
         let topHeight = Math.floor(Math.random() * (canvas.height - gap));
         pipes.push({
             x: canvas.width,
