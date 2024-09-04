@@ -22,6 +22,7 @@ let pipes = [];
 let frame = 0;
 let score = 0;
 let gameOver = false;
+let showCollision = false; // Показывать место касания
 
 document.getElementById("startButton").addEventListener("click", function() {
     document.getElementById("startScreen").style.display = "none";
@@ -103,24 +104,43 @@ function updatePipes() {
 
 function checkCollision() {
     for (let i = 0; i < pipes.length; i++) {
-        if (bird.x + bird.width > pipes[i].x && bird.x < pipes[i].x + pipes[i].width) {
-            if (bird.y < pipes[i].topHeight || bird.y + bird.height > pipes[i].bottom) {
-                endGame();
-            }
+        if (
+            bird.x + bird.width > pipes[i].x &&    // правая часть птицы касается трубы
+            bird.x < pipes[i].x + pipes[i].width && // левая часть птицы касается трубы
+            (
+                bird.y < pipes[i].topHeight ||      // верхняя часть птицы касается верхней трубы
+                bird.y + bird.height > pipes[i].bottom // нижняя часть птицы касается нижней трубы
+            )
+        ) {
+            showCollision = true;
+            endGame();
         }
     }
 
-    if (bird.y + bird.height >= canvas.height || bird.y <= 0) {
+    if (bird.y + bird.height >= canvas.height || bird.y <= 0) { // Птица касается верхней или нижней границы
+        showCollision = true;
         endGame();
     }
 }
 
 function endGame() {
     gameOver = true;
-    canvas.style.display = "none";
-    document.getElementById("finalScore").textContent = "Score: " + score;
-    saveScore(score);
-    document.getElementById("gameOverScreen").style.display = "block";
+    // Показать "Game Over" и результат
+    ctx.fillStyle = "red";
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
+    ctx.fillStyle = "black";
+    ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
+
+    if (!showCollision) {
+        setTimeout(function() {
+            document.getElementById("finalScore").textContent = "Score: " + score;
+            document.getElementById("gameOverScreen").style.display = "block";
+            canvas.style.display = "none";
+            saveScore(score);
+        }, 2000); // Показывать экран игры через 2 секунды после столкновения
+    }
 }
 
 function resetGame() {
@@ -130,6 +150,7 @@ function resetGame() {
     frame = 0;
     score = 0;
     gameOver = false;
+    showCollision = false; // Скрыть место столкновения
 }
 
 function updateBird() {
