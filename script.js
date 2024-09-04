@@ -1,8 +1,13 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 320;
-canvas.height = 480;
+// Устанавливаем адаптацию под экран устройства
+function resizeCanvas() {
+    canvas.width = window.innerWidth * 0.9; // 90% от ширины экрана
+    canvas.height = window.innerHeight * 0.9; // 90% от высоты экрана
+}
+resizeCanvas(); // Первоначальная адаптация
+window.addEventListener('resize', resizeCanvas); // Адаптация при изменении размеров окна
 
 // Загружаем изображение птички
 const birdImage = new Image();
@@ -133,14 +138,11 @@ function endGame() {
     ctx.fillStyle = "black";
     ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
 
-    if (!showCollision) {
-        setTimeout(function() {
-            document.getElementById("finalScore").textContent = "Score: " + score;
-            canvas.style.display = "none";  // Скрыть канвас
-            document.getElementById("gameOverScreen").style.display = "block"; // Показать экран "Game Over"
-            saveScore(score);
-        }, 2000); // Показывать экран игры через 2 секунды после столкновения
-    }
+    // Показать кнопку сразу после окончания игры
+    document.getElementById("finalScore").textContent = "Score: " + score;
+    document.getElementById("gameOverScreen").style.display = "block";
+    canvas.style.display = "none";  // Скрыть канвас
+    saveScore(score);
 }
 
 function resetGame() {
@@ -166,7 +168,7 @@ function saveScore(score) {
     if (leaderboard.length > 10) {
         leaderboard = leaderboard.slice(0, 10); // Храним только топ-10
     }
-    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+    localStorage.setItem('leaderboard", JSON.stringify(leaderboard));
 }
 
 // Функция для загрузки и отображения лидерборда
@@ -198,7 +200,4 @@ function gameLoop() {
     ctx.fillText("Score: " + score, 10, 20);
 
     frame++;
-    if (!gameOver && document.getElementById("startScreen").style.display === "none") {
-        requestAnimationFrame(gameLoop);
-    }
-}
+    if (!gameOver && document.getElementById("startScreen").style.display === "none")

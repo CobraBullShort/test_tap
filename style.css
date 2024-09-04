@@ -7,6 +7,16 @@ body {
     background-color: #70c5ce;
 }
 
+#startScreen {
+    text-align: center;
+}
+
+#startButton {
+    padding: 10px 20px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 canvas {
     background-color: #70c5ce;
     border: 2px solid #000;
