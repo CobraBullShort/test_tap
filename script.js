@@ -4,13 +4,17 @@ const ctx = canvas.getContext("2d");
 canvas.width = 320;
 canvas.height = 480;
 
+// Загружаем изображение птички
+const birdImage = new Image();
+birdImage.src = 'bird.png'; // Укажите путь к вашему изображению
+
 let bird = {
     x: 50,
     y: 150,
-    width: 20,
-    height: 20,
+    width: 32,   // Ширина птички 32 пикселя
+    height: 32,  // Высота птички 32 пикселя
     gravity: 0.54,
-    lift: -8.5,
+    lift: -9,
     velocity: 0
 };
 
@@ -62,8 +66,7 @@ canvas.addEventListener("touchstart", function(event) {
 });
 
 function drawBird() {
-    ctx.fillStyle = "yellow";
-    ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
+    ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height); // Отрисовка изображения птички
 }
 
 function drawPipes() {
