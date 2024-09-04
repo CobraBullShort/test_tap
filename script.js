@@ -136,8 +136,8 @@ function endGame() {
     if (!showCollision) {
         setTimeout(function() {
             document.getElementById("finalScore").textContent = "Score: " + score;
-            document.getElementById("gameOverScreen").style.display = "block";
-            canvas.style.display = "none";
+            canvas.style.display = "none";  // Скрыть канвас
+            document.getElementById("gameOverScreen").style.display = "block"; // Показать экран "Game Over"
             saveScore(score);
         }, 2000); // Показывать экран игры через 2 секунды после столкновения
     }
