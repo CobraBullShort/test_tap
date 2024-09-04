@@ -1,11 +1,21 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Устанавливаем адаптацию под экран устройства
+// Устанавливаем правильное соотношение сторон для канваса
 function resizeCanvas() {
-    canvas.width = window.innerWidth * 0.9; // 90% от ширины экрана
-    canvas.height = window.innerHeight * 0.9; // 90% от высоты экрана
+    const aspectRatio = 320 / 480; // Соотношение сторон игры (ширина/высота)
+    let newWidth = window.innerWidth * 0.9;
+    let newHeight = newWidth / aspectRatio;
+
+    if (newHeight > window.innerHeight * 0.9) {
+        newHeight = window.innerHeight * 0.9;
+        newWidth = newHeight * aspectRatio;
+    }
+
+    canvas.width = newWidth;
+    canvas.height = newHeight;
 }
+
 resizeCanvas(); // Первоначальная адаптация
 window.addEventListener('resize', resizeCanvas); // Адаптация при изменении размеров окна
 
@@ -168,7 +178,7 @@ function saveScore(score) {
     if (leaderboard.length > 10) {
         leaderboard = leaderboard.slice(0, 10); // Храним только топ-10
     }
-    localStorage.setItem('leaderboard", JSON.stringify(leaderboard));
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
 }
 
 // Функция для загрузки и отображения лидерборда
@@ -200,4 +210,5 @@ function gameLoop() {
     ctx.fillText("Score: " + score, 10, 20);
 
     frame++;
-    if (!gameOver && document.getElementById("startScreen").style.display === "none")
+    if (!gameOver && document.getElementById("startScreen").style.display === "none") {
+        requestAnimationFrame
