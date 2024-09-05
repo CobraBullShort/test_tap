@@ -94,7 +94,9 @@ function drawPipes() {
 }
 
 function updatePipes() {
-    if (frame % 90 === 0) {
+    const pipeInterval = 90 * 1.15; // Увеличили интервал между трубами на 15%
+    
+    if (frame % Math.floor(pipeInterval) === 0) {
         let gap = 105;
         let topHeight = Math.floor(Math.random() * (canvas.height - gap));
         pipes.push({
