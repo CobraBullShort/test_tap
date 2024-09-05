@@ -187,12 +187,14 @@ function showGameOverScreen() {
 }
 
 function displayButtons() {
+    const canvasRect = canvas.getBoundingClientRect(); // Получаем координаты и размеры канваса
+
     // Создаем кнопку "Начать сначала"
     const restartButton = document.createElement('button');
     restartButton.innerText = "Restart Game";
     restartButton.style.position = 'absolute';
-    restartButton.style.top = (canvas.height / 2 + 100) + 'px';
-    restartButton.style.left = (canvas.width / 2 - 50) + 'px';
+    restartButton.style.top = (canvasRect.top + canvas.height / 2 + 50) + 'px';
+    restartButton.style.left = (canvasRect.left + canvas.width / 2 - 50) + 'px';
     restartButton.onclick = function() {
         resetGame();
         gameLoop();
@@ -204,8 +206,8 @@ function displayButtons() {
     const menuButton = document.createElement('button');
     menuButton.innerText = "Back to Menu";
     menuButton.style.position = 'absolute';
-    menuButton.style.top = (canvas.height / 2 + 150) + 'px';
-    menuButton.style.left = (canvas.width / 2 - 50) + 'px';
+    menuButton.style.top = (canvasRect.top + canvas.height / 2 + 100) + 'px';
+    menuButton.style.left = (canvasRect.left + canvas.width / 2 - 50) + 'px';
     menuButton.onclick = function() {
         document.getElementById("startScreen").style.display = "block";
         canvas.style.display = "none";
@@ -276,9 +278,9 @@ function gameLoop() {
         }
     }
 
-    drawBird();
     drawPipes();
     drawGround(); // Рисуем землю
+    drawBird();   // Отрисовываем птичку на переднем плане
 
     ctx.fillStyle = "black";
     ctx.font = "16px Arial";
