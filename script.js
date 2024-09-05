@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 
 // Устанавливаем правильное соотношение сторон для канваса
 function resizeCanvas() {
-    const aspectRatio = 320 / 480; // Соотношение сторон игры (ширина/высота)
+    const aspectRatio = 768 / 1024; // Соотношение сторон игры (ширина/высота)
     let newWidth = window.innerWidth * 0.9;
     let newHeight = newWidth / aspectRatio;
 
@@ -82,7 +82,24 @@ canvas.addEventListener("touchstart", function(event) {
 });
 
 function drawBird() {
-    ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height); // Отрисовка изображения птички
+    ctx.save();
+    ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2); // Перемещаем точку вращения к центру птицы
+    let angle = 0;
+
+    if (bird.velocity < 0) {
+        angle = -20 * Math.PI / 180; // Поворачиваем вверх на 20 градусов
+    } else if (bird.velocity > 0) {
+        angle = 20 * Math.PI / 180; // Поворачиваем вниз на 20 градусов
+    }
+
+    ctx.rotate(angle); // Поворот канваса
+    ctx.drawImage(birdImage, -bird.width / 2, -bird.height / 2, bird.width, bird.height); // Отрисовываем птичку
+    ctx.restore();
+}
+
+function drawGround() {
+    ctx.fillStyle = "#8B4513"; // Коричневый цвет земли
+    ctx.fillRect(0, canvas.height - 50, canvas.width, 50); // Земля внизу
 }
 
 function drawPipes() {
@@ -98,13 +115,13 @@ function updatePipes() {
     
     if (frame % Math.floor(pipeInterval) === 0) {
         let gap = 105;
-        let topHeight = Math.floor(Math.random() * (canvas.height - gap));
+        let topHeight = Math.floor(Math.random() * (canvas.height - gap - 50));
         pipes.push({
             x: canvas.width,
             top: 0,
             topHeight: topHeight,
             bottom: topHeight + gap,
-            bottomHeight: canvas.height - topHeight - gap,
+            bottomHeight: canvas.height - topHeight - gap - 50, // Учитываем землю
             width: 20
         });
     }
@@ -122,11 +139,11 @@ function updatePipes() {
 function checkCollision() {
     for (let i = 0; i < pipes.length; i++) {
         if (
-            bird.x + bird.width > pipes[i].x &&    // правая часть птицы касается трубы
-            bird.x < pipes[i].x + pipes[i].width && // левая часть птицы касается трубы
+            bird.x + bird.width - 5 > pipes[i].x &&    // уменьшение зоны коллизии
+            bird.x + 5 < pipes[i].x + pipes[i].width && // уменьшение зоны коллизии
             (
-                bird.y < pipes[i].topHeight ||      // верхняя часть птицы касается верхней трубы
-                bird.y + bird.height > pipes[i].bottom // нижняя часть птицы касается нижней трубы
+                bird.y + 5 < pipes[i].topHeight ||       // уменьшение зоны коллизии сверху
+                bird.y + bird.height - 5 > pipes[i].bottom // уменьшение зоны коллизии снизу
             )
         ) {
             showCollision = true;
@@ -134,7 +151,7 @@ function checkCollision() {
         }
     }
 
-    if (bird.y + bird.height >= canvas.height || bird.y <= 0) { // Птица касается верхней или нижней границы
+    if (bird.y + bird.height >= canvas.height - 50) { // Птичка касается земли
         showCollision = true;
         endGame();
     }
@@ -142,19 +159,30 @@ function checkCollision() {
 
 function endGame() {
     gameOver = true;
-    // Показать "Game Over" и результат
-    ctx.fillStyle = "red";
-    ctx.font = "30px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
-    ctx.fillStyle = "black";
-    ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
+    bird.gravity = 1.5; // Увеличиваем силу гравитации для падения птички
 
-    // Показать кнопку сразу после окончания игры
-    document.getElementById("finalScore").textContent = "Score: " + score;
-    document.getElementById("gameOverScreen").style.display = "block";
-    canvas.style.display = "none";  // Скрыть канвас
-    saveScore(score);
+    const gameEndInterval = setInterval(() => {
+        bird.velocity += bird.gravity;
+        bird.y += bird.velocity;
+
+        if (bird.y + bird.height >= canvas.height - 50) { // Птичка упала на землю
+            bird.y = canvas.height - bird.height - 50; // Останавливаем на земле
+            clearInterval(gameEndInterval); // Останавливаем падение
+
+            // Показать текст "Game Over" и результат
+            ctx.fillStyle = "red";
+            ctx.font = "30px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
+            ctx.fillStyle = "black";
+            ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
+
+            document.getElementById("finalScore").textContent = "Score: " + score;
+            document.getElementById("gameOverScreen").style.display = "block";
+            canvas.style.display = "none";  // Скрыть канвас
+            saveScore(score);
+        }
+    }, 20);
 }
 
 function resetGame() {
@@ -206,6 +234,7 @@ function gameLoop() {
 
     drawBird();
     drawPipes();
+    drawGround(); // Рисуем землю
 
     ctx.fillStyle = "black";
     ctx.font = "16px Arial";
@@ -213,6 +242,6 @@ function gameLoop() {
 
     frame++;
     if (!gameOver && document.getElementById("startScreen").style.display === "none") {
-        requestAnimationFrame(gameLoop); // Цикл игры продолжается
+        requestAnimationFrame(gameLoop); // Продолжаем цикл игры
     }
 }
