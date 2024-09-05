@@ -189,8 +189,15 @@ function showGameOverScreen() {
 function displayButtons() {
     const canvasRect = canvas.getBoundingClientRect(); // Получаем координаты и размеры канваса
 
+    // Удаляем предыдущие кнопки, если они остались
+    const existingRestartButton = document.getElementById('restartButton');
+    const existingMenuButton = document.getElementById('menuButton');
+    if (existingRestartButton) existingRestartButton.remove();
+    if (existingMenuButton) existingMenuButton.remove();
+
     // Создаем кнопку "Начать сначала"
     const restartButton = document.createElement('button');
+    restartButton.id = 'restartButton'; // Устанавливаем ID для удобства
     restartButton.innerText = "Restart Game";
     restartButton.style.position = 'absolute';
     restartButton.style.top = (canvasRect.top + canvas.height / 2 + 50) + 'px';
@@ -204,6 +211,7 @@ function displayButtons() {
 
     // Создаем кнопку "Выйти в меню"
     const menuButton = document.createElement('button');
+    menuButton.id = 'menuButton'; // Устанавливаем ID для удобства
     menuButton.innerText = "Back to Menu";
     menuButton.style.position = 'absolute';
     menuButton.style.top = (canvasRect.top + canvas.height / 2 + 100) + 'px';
