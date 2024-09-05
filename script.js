@@ -188,11 +188,13 @@ function endGame() {
 function resetGame() {
     bird.y = 150;
     bird.velocity = 0;
+    bird.gravity = 0.54; // Сброс гравитации на начальное значение
     pipes = [];
     frame = 0;
     score = 0;
     gameOver = false;
     showCollision = false; // Скрыть место столкновения
+}
 }
 
 function updateBird() {
