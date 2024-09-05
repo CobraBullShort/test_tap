@@ -166,23 +166,57 @@ function endGame() {
         bird.y += bird.velocity;
 
         if (bird.y + bird.height >= canvas.height - 50) { // Птичка упала на землю
-            bird.y = canvas.height - bird.height - 50; // Останавливаем на земле
+            bird.y = canvas.height - bird.height - 50; // Останавливаем птичку на земле
             clearInterval(gameEndInterval); // Останавливаем падение
 
-            // Показать текст "Game Over" и результат
-            ctx.fillStyle = "red";
-            ctx.font = "30px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
-            ctx.fillStyle = "black";
-            ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
-
-            document.getElementById("finalScore").textContent = "Score: " + score;
-            document.getElementById("gameOverScreen").style.display = "block";
-            canvas.style.display = "none";  // Скрыть канвас
-            saveScore(score);
+            // Теперь отображаем результат игры прямо на игровом поле
+            showGameOverScreen();
         }
     }, 20);
+}
+
+function showGameOverScreen() {
+    ctx.fillStyle = "red";
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
+    ctx.fillStyle = "black";
+    ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
+
+    // Отображаем кнопки на игровом поле
+    displayButtons();
+}
+
+function displayButtons() {
+    // Создаем кнопку "Начать сначала"
+    const restartButton = document.createElement('button');
+    restartButton.innerText = "Restart Game";
+    restartButton.style.position = 'absolute';
+    restartButton.style.top = (canvas.height / 2 + 100) + 'px';
+    restartButton.style.left = (canvas.width / 2 - 50) + 'px';
+    restartButton.onclick = function() {
+        resetGame();
+        gameLoop();
+        restartButton.remove();
+        menuButton.remove();
+    };
+
+    // Создаем кнопку "Выйти в меню"
+    const menuButton = document.createElement('button');
+    menuButton.innerText = "Back to Menu";
+    menuButton.style.position = 'absolute';
+    menuButton.style.top = (canvas.height / 2 + 150) + 'px';
+    menuButton.style.left = (canvas.width / 2 - 50) + 'px';
+    menuButton.onclick = function() {
+        document.getElementById("startScreen").style.display = "block";
+        canvas.style.display = "none";
+        restartButton.remove();
+        menuButton.remove();
+    };
+
+    // Добавляем кнопки в DOM
+    document.body.appendChild(restartButton);
+    document.body.appendChild(menuButton);
 }
 
 function resetGame() {
