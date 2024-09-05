@@ -195,7 +195,6 @@ function resetGame() {
     gameOver = false;
     showCollision = false; // Скрыть место столкновения
 }
-}
 
 function updateBird() {
     bird.velocity += bird.gravity;
