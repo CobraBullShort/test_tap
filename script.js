@@ -158,19 +158,18 @@ function checkCollision() {
 }
 
 function endGame() {
-    gameOver = true;
-    bird.gravity = 1.5; // Увеличиваем силу гравитации для падения птички
+    gameOver = true; // Устанавливаем флаг завершения игры
+    bird.gravity = 1.5; // Увеличиваем гравитацию, чтобы птичка быстрее падала
 
-    const gameEndInterval = setInterval(() => {
+    // Продолжаем обновлять игру, чтобы птичка падала до земли
+    const fallInterval = setInterval(() => {
         bird.velocity += bird.gravity;
         bird.y += bird.velocity;
 
-        if (bird.y + bird.height >= canvas.height - 50) { // Птичка упала на землю
+        if (bird.y + bird.height >= canvas.height - 50) { // Птичка коснулась земли
             bird.y = canvas.height - bird.height - 50; // Останавливаем птичку на земле
-            clearInterval(gameEndInterval); // Останавливаем падение
-
-            // Теперь отображаем результат игры прямо на игровом поле
-            showGameOverScreen();
+            clearInterval(fallInterval); // Останавливаем падение
+            showGameOverScreen(); // Показать результат игры
         }
     }, 20);
 }
