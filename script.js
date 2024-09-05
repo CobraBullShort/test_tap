@@ -264,6 +264,16 @@ function gameLoop() {
         updateBird();
         updatePipes();
         checkCollision();
+    } else {
+        // Птичка продолжает падать после завершения игры
+        bird.velocity += bird.gravity;
+        bird.y += bird.velocity;
+
+        // Останавливаем птичку, когда она касается земли
+        if (bird.y + bird.height >= canvas.height - 50) {
+            bird.y = canvas.height - bird.height - 50; // Останавливаем птичку на земле
+            showGameOverScreen(); // Показываем экран с результатами
+        }
     }
 
     drawBird();
@@ -275,7 +285,5 @@ function gameLoop() {
     ctx.fillText("Score: " + score, 10, 20);
 
     frame++;
-    if (!gameOver && document.getElementById("startScreen").style.display === "none") {
-        requestAnimationFrame(gameLoop); // Продолжаем цикл игры
-    }
+    requestAnimationFrame(gameLoop); // Продолжаем цикл игры
 }
