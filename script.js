@@ -40,10 +40,10 @@ let gameOver = false;
 let showCollision = false; // Показывать место касания
 
 document.getElementById("startButton").addEventListener("click", function() {
-    document.getElementById("startScreen").style.display = "none";
-    canvas.style.display = "block";
-    resetGame();
-    gameLoop();
+    document.getElementById("startScreen").style.display = "none";  // Скрываем начальный экран
+    canvas.style.display = "block";  // Показываем канвас
+    resetGame();  // Сбрасываем параметры игры
+    gameLoop();  // Запускаем цикл игры
 });
 
 document.getElementById("leaderboardButton").addEventListener("click", function() {
@@ -211,4 +211,6 @@ function gameLoop() {
 
     frame++;
     if (!gameOver && document.getElementById("startScreen").style.display === "none") {
-        requestAnimationFrame
+        requestAnimationFrame(gameLoop); // Цикл игры продолжается
+    }
+}
