@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird for Telegram</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flappy Bird</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
         <button id="startButton">Start Game</button>
         <button id="leaderboardButton">View Leaderboard</button>
     </div>
-    
+
     <canvas id="gameCanvas" style="display: none;"></canvas>
 
     <div id="leaderboardScreen" style="display: none;">
@@ -19,7 +19,7 @@
         <div id="leaderboard"></div>
         <button id="backButton">Back to Menu</button>
     </div>
-    
+
     <div id="gameOverScreen" style="display: none;">
         <h2>Game Over</h2>
         <p id="finalScore"></p>
@@ -28,5 +28,14 @@
     </div>
 
     <script src="script.js"></script>
+
+    <script>
+        // Отключение зумирования при множественных тапах
+        document.addEventListener('touchmove', function(event) {
+            if (event.scale !== 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+    </script>
 </body>
 </html>
