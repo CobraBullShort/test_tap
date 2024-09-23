@@ -40,6 +40,34 @@ let gameOver = false;
 let showCollision = false; // Показывать место касания
 let gameOverScreenShown = false; // Флаг для отображения экрана Game Over
 
+// Предотвращаем зумирование при двойном тапе
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
+
+// Предотвращаем зумирование при жестах
+document.addEventListener('gesturestart', function(event) {
+    event.preventDefault();
+});
+document.addEventListener('gesturechange', function(event) {
+    event.preventDefault();
+});
+document.addEventListener('gestureend', function(event) {
+    event.preventDefault();
+});
+
+// Предотвращаем масштабирование при использовании нескольких пальцев
+document.addEventListener('touchmove', function(event) {
+    if (event.scale !== 1) {
+        event.preventDefault();
+    }
+}, { passive: false });
+
 document.getElementById("startButton").addEventListener("click", function() {
     document.getElementById("startScreen").style.display = "none";  // Скрываем начальный экран
     canvas.style.display = "block";  // Показываем канвас
@@ -62,8 +90,7 @@ document.getElementById("restartButton").addEventListener("click", function() {
     document.getElementById("gameOverScreen").style.display = "none";
     resetGame();
     canvas.style.display = "block";
-    // Удаляем вызов gameLoop(), так как цикл уже запущен
-    // gameLoop();
+    // Не вызываем gameLoop() снова
 });
 
 document.getElementById("backToMenuButton").addEventListener("click", function() {
@@ -77,11 +104,13 @@ document.addEventListener("keydown", function(event) {
     }
 });
 
+// Обновленный обработчик touchstart для предотвращения зумирования
 canvas.addEventListener("touchstart", function(event) {
+    event.preventDefault(); // Предотвращаем зумирование
     if (!gameOver) {
         bird.velocity = bird.lift;
     }
-});
+}, { passive: false });
 
 function drawBird() {
     ctx.save();
@@ -150,6 +179,7 @@ function checkCollision() {
         ) {
             showCollision = true;
             endGame();
+            break; // Добавляем break, чтобы избежать дальнейших проверок после столкновения
         }
     }
 
@@ -160,8 +190,11 @@ function checkCollision() {
 }
 
 function endGame() {
-    gameOver = true; // Устанавливаем флаг завершения игры
-    bird.gravity = 1.5; // Увеличиваем гравитацию, чтобы птичка быстрее падала
+    if (!gameOver) {
+        gameOver = true; // Устанавливаем флаг завершения игры
+        bird.gravity = 1.5; // Увеличиваем гравитацию, чтобы птичка быстрее падала
+        saveScore(score); // Сохраняем счет в лидерборд
+    }
     // Удаляем setInterval, так как обновление происходит в gameLoop()
 }
 
@@ -229,6 +262,12 @@ function resetGame() {
     gameOver = false;
     showCollision = false; // Скрыть место столкновения
     gameOverScreenShown = false; // Сбрасываем флаг отображения экрана Game Over
+
+    // Удаляем кнопки, если они остались
+    const existingRestartButton = document.getElementById('restartButton');
+    const existingMenuButton = document.getElementById('menuButton');
+    if (existingRestartButton) existingRestartButton.remove();
+    if (existingMenuButton) existingMenuButton.remove();
 }
 
 function updateBird() {
