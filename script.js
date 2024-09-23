@@ -1,5 +1,6 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+let gameLoopRunning = false; // Флаг для отслеживания состояния цикла игры
 
 // Устанавливаем правильное соотношение сторон для канваса
 function resizeCanvas() {
@@ -68,13 +69,18 @@ document.addEventListener('touchmove', function(event) {
     }
 }, { passive: false });
 
+// Обработчик события для кнопки "Start"
 document.getElementById("startButton").addEventListener("click", function() {
     document.getElementById("startScreen").style.display = "none";  // Скрываем начальный экран
     canvas.style.display = "block";  // Показываем канвас
     resetGame();  // Сбрасываем параметры игры
-    gameLoop();  // Запускаем цикл игры
+    if (!gameLoopRunning) {
+        gameLoop();
+        gameLoopRunning = true;
+    }
 });
 
+// Обработчики событий для других кнопок
 document.getElementById("leaderboardButton").addEventListener("click", function() {
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("leaderboardScreen").style.display = "block";
@@ -90,7 +96,10 @@ document.getElementById("restartButton").addEventListener("click", function() {
     document.getElementById("gameOverScreen").style.display = "none";
     resetGame();
     canvas.style.display = "block";
-    // Не вызываем gameLoop() снова
+    if (!gameLoopRunning) {
+        gameLoop();
+        gameLoopRunning = true;
+    }
 });
 
 document.getElementById("backToMenuButton").addEventListener("click", function() {
@@ -98,6 +107,7 @@ document.getElementById("backToMenuButton").addEventListener("click", function()
     document.getElementById("startScreen").style.display = "block";
 });
 
+// Обработчики событий для управления птичкой
 document.addEventListener("keydown", function(event) {
     if (event.code === "Space" && !gameOver) {
         bird.velocity = bird.lift;
@@ -112,25 +122,26 @@ canvas.addEventListener("touchstart", function(event) {
     }
 }, { passive: false });
 
+// Функции рисования и обновления игры
 function drawBird() {
     ctx.save();
-    ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2); // Перемещаем точку вращения к центру птицы
+    ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
     let angle = 0;
 
     if (bird.velocity < 0) {
-        angle = -20 * Math.PI / 180; // Поворачиваем вверх на 20 градусов
+        angle = -20 * Math.PI / 180;
     } else if (bird.velocity > 0) {
-        angle = 20 * Math.PI / 180; // Поворачиваем вниз на 20 градусов
+        angle = 20 * Math.PI / 180;
     }
 
-    ctx.rotate(angle); // Поворот канваса
-    ctx.drawImage(birdImage, -bird.width / 2, -bird.height / 2, bird.width, bird.height); // Отрисовываем птичку
+    ctx.rotate(angle);
+    ctx.drawImage(birdImage, -bird.width / 2, -bird.height / 2, bird.width, bird.height);
     ctx.restore();
 }
 
 function drawGround() {
-    ctx.fillStyle = "#8B4513"; // Коричневый цвет земли
-    ctx.fillRect(0, canvas.height - 50, canvas.width, 50); // Земля внизу
+    ctx.fillStyle = "#8B4513";
+    ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
 }
 
 function drawPipes() {
@@ -142,7 +153,7 @@ function drawPipes() {
 }
 
 function updatePipes() {
-    const pipeInterval = 90 * 1.15; // Увеличили интервал между трубами на 15%
+    const pipeInterval = 90 * 1.15;
     
     if (frame % Math.floor(pipeInterval) === 0) {
         let gap = 105;
@@ -152,7 +163,7 @@ function updatePipes() {
             top: 0,
             topHeight: topHeight,
             bottom: topHeight + gap,
-            bottomHeight: canvas.height - topHeight - gap - 50, // Учитываем землю
+            bottomHeight: canvas.height - topHeight - gap - 50,
             width: 20
         });
     }
@@ -170,20 +181,20 @@ function updatePipes() {
 function checkCollision() {
     for (let i = 0; i < pipes.length; i++) {
         if (
-            bird.x + bird.width - 5 > pipes[i].x &&    // уменьшение зоны коллизии
-            bird.x + 5 < pipes[i].x + pipes[i].width && // уменьшение зоны коллизии
+            bird.x + bird.width - 5 > pipes[i].x &&
+            bird.x + 5 < pipes[i].x + pipes[i].width &&
             (
-                bird.y + 5 < pipes[i].topHeight ||       // уменьшение зоны коллизии сверху
-                bird.y + bird.height - 5 > pipes[i].bottom // уменьшение зоны коллизии снизу
+                bird.y + 5 < pipes[i].topHeight ||
+                bird.y + bird.height - 5 > pipes[i].bottom
             )
         ) {
             showCollision = true;
             endGame();
-            break; // Добавляем break, чтобы избежать дальнейших проверок после столкновения
+            break;
         }
     }
 
-    if (bird.y + bird.height >= canvas.height - 50) { // Птичка касается земли
+    if (bird.y + bird.height >= canvas.height - 50) {
         showCollision = true;
         endGame();
     }
@@ -191,27 +202,25 @@ function checkCollision() {
 
 function endGame() {
     if (!gameOver) {
-        gameOver = true; // Устанавливаем флаг завершения игры
-        bird.gravity = 1.5; // Увеличиваем гравитацию, чтобы птичка быстрее падала
-        saveScore(score); // Сохраняем счет в лидерборд
+        gameOver = true;
+        bird.gravity = 1.5;
+        saveScore(score);
     }
-    // Удаляем setInterval, так как обновление происходит в gameLoop()
 }
 
 function showGameOverScreen() {
     ctx.fillStyle = "red";
-    ctx.font = "30px Arial";
+    ctx.font = (canvas.height * 0.05) + "px Arial";
     ctx.textAlign = "center";
     ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
     ctx.fillStyle = "black";
     ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
 
-    // Отображаем кнопки на игровом поле
     displayButtons();
 }
 
 function displayButtons() {
-    const canvasRect = canvas.getBoundingClientRect(); // Получаем координаты и размеры канваса
+    const canvasRect = canvas.getBoundingClientRect();
 
     // Удаляем предыдущие кнопки, если они остались
     const existingRestartButton = document.getElementById('restartButton');
@@ -221,7 +230,7 @@ function displayButtons() {
 
     // Создаем кнопку "Начать сначала"
     const restartButton = document.createElement('button');
-    restartButton.id = 'restartButton'; // Устанавливаем ID для удобства
+    restartButton.id = 'restartButton';
     restartButton.innerText = "Restart Game";
     restartButton.style.position = 'absolute';
     restartButton.style.top = (canvasRect.top + canvas.height / 2 + 50) + 'px';
@@ -230,12 +239,15 @@ function displayButtons() {
         resetGame();
         restartButton.remove();
         menuButton.remove();
-        // Не вызываем gameLoop() снова
+        if (!gameLoopRunning) {
+            gameLoop();
+            gameLoopRunning = true;
+        }
     };
 
     // Создаем кнопку "Выйти в меню"
     const menuButton = document.createElement('button');
-    menuButton.id = 'menuButton'; // Устанавливаем ID для удобства
+    menuButton.id = 'menuButton';
     menuButton.innerText = "Back to Menu";
     menuButton.style.position = 'absolute';
     menuButton.style.top = (canvasRect.top + canvas.height / 2 + 100) + 'px';
@@ -255,13 +267,17 @@ function displayButtons() {
 function resetGame() {
     bird.y = 150;
     bird.velocity = 0;
-    bird.gravity = 0.54; // Сброс гравитации на начальное значение
+    bird.gravity = 0.54;
     pipes = [];
     frame = 0;
     score = 0;
     gameOver = false;
-    showCollision = false; // Скрыть место столкновения
-    gameOverScreenShown = false; // Сбрасываем флаг отображения экрана Game Over
+    showCollision = false;
+    gameOverScreenShown = false;
+
+    gameLoopRunning = false; // Сбрасываем флаг цикла игры
+
+    resizeCanvas(); // Обновляем размеры канваса
 
     // Удаляем кнопки, если они остались
     const existingRestartButton = document.getElementById('restartButton');
@@ -281,7 +297,7 @@ function saveScore(score) {
     leaderboard.push(score);
     leaderboard.sort((a, b) => b - a);
     if (leaderboard.length > 10) {
-        leaderboard = leaderboard.slice(0, 10); // Храним только топ-10
+        leaderboard = leaderboard.slice(0, 10);
     }
     localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
 }
@@ -306,26 +322,27 @@ function gameLoop() {
         updatePipes();
         checkCollision();
     } else {
-        // Птичка продолжает падать после завершения игры
         bird.velocity += bird.gravity;
         bird.y += bird.velocity;
 
-        // Останавливаем птичку, когда она касается земли
         if (!gameOverScreenShown && bird.y + bird.height >= canvas.height - 50) {
-            bird.y = canvas.height - bird.height - 50; // Останавливаем птичку на земле
-            showGameOverScreen(); // Показываем экран с результатами
-            gameOverScreenShown = true; // Устанавливаем флаг, чтобы избежать повторного вызова
+            bird.y = canvas.height - bird.height - 50;
+            showGameOverScreen();
+            gameOverScreenShown = true;
         }
     }
 
     drawPipes();
-    drawGround(); // Рисуем землю
-    drawBird();   // Отрисовываем птичку на переднем плане
+    drawGround();
+    drawBird();
 
+    // Обновляем настройки шрифта и позицию текста
     ctx.fillStyle = "black";
-    ctx.font = "16px Arial";
-    ctx.fillText("Score: " + score, 10, 20);
+    ctx.font = (canvas.height * 0.03) + "px Arial";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("Score: " + score, canvas.width * 0.02, canvas.height * 0.02);
 
     frame++;
-    requestAnimationFrame(gameLoop); // Продолжаем цикл игры
+    requestAnimationFrame(gameLoop);
 }
