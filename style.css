@@ -1,6 +1,9 @@
-body {
+html, body {
     margin: 0;
     padding: 0;
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+    overflow: hidden; /* Предотвращает прокрутку страницы */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -10,6 +13,8 @@ body {
 }
 
 button {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
     padding: 10px 20px;
     font-size: 18px;
     cursor: pointer;
@@ -18,7 +23,9 @@ button {
     max-width: 200px;
 }
 
-#gameOverScreen, #startScreen, #leaderboardScreen {
+#gameOverScreen,
+#startScreen,
+#leaderboardScreen {
     display: flex;
     flex-direction: column;
     align-items: center;
