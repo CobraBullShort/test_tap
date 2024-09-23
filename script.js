@@ -38,6 +38,7 @@ let frame = 0;
 let score = 0;
 let gameOver = false;
 let showCollision = false; // Показывать место касания
+let gameOverScreenShown = false; // Флаг для отображения экрана Game Over
 
 document.getElementById("startButton").addEventListener("click", function() {
     document.getElementById("startScreen").style.display = "none";  // Скрываем начальный экран
@@ -61,7 +62,8 @@ document.getElementById("restartButton").addEventListener("click", function() {
     document.getElementById("gameOverScreen").style.display = "none";
     resetGame();
     canvas.style.display = "block";
-    gameLoop();
+    // Удаляем вызов gameLoop(), так как цикл уже запущен
+    // gameLoop();
 });
 
 document.getElementById("backToMenuButton").addEventListener("click", function() {
@@ -160,18 +162,7 @@ function checkCollision() {
 function endGame() {
     gameOver = true; // Устанавливаем флаг завершения игры
     bird.gravity = 1.5; // Увеличиваем гравитацию, чтобы птичка быстрее падала
-
-    // Продолжаем обновлять игру, чтобы птичка падала до земли
-    const fallInterval = setInterval(() => {
-        bird.velocity += bird.gravity;
-        bird.y += bird.velocity;
-
-        if (bird.y + bird.height >= canvas.height - 50) { // Птичка коснулась земли
-            bird.y = canvas.height - bird.height - 50; // Останавливаем птичку на земле
-            clearInterval(fallInterval); // Останавливаем падение
-            showGameOverScreen(); // Показать результат игры
-        }
-    }, 20);
+    // Удаляем setInterval, так как обновление происходит в gameLoop()
 }
 
 function showGameOverScreen() {
@@ -204,9 +195,9 @@ function displayButtons() {
     restartButton.style.left = (canvasRect.left + canvas.width / 2 - 50) + 'px';
     restartButton.onclick = function() {
         resetGame();
-        gameLoop();
         restartButton.remove();
         menuButton.remove();
+        // Не вызываем gameLoop() снова
     };
 
     // Создаем кнопку "Выйти в меню"
@@ -237,6 +228,7 @@ function resetGame() {
     score = 0;
     gameOver = false;
     showCollision = false; // Скрыть место столкновения
+    gameOverScreenShown = false; // Сбрасываем флаг отображения экрана Game Over
 }
 
 function updateBird() {
@@ -280,9 +272,10 @@ function gameLoop() {
         bird.y += bird.velocity;
 
         // Останавливаем птичку, когда она касается земли
-        if (bird.y + bird.height >= canvas.height - 50) {
+        if (!gameOverScreenShown && bird.y + bird.height >= canvas.height - 50) {
             bird.y = canvas.height - bird.height - 50; // Останавливаем птичку на земле
             showGameOverScreen(); // Показываем экран с результатами
+            gameOverScreenShown = true; // Устанавливаем флаг, чтобы избежать повторного вызова
         }
     }
 
