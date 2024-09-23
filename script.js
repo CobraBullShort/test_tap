@@ -1,5 +1,6 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+let animationFrameId; // Переменная для хранения идентификатора анимации
 let gameLoopRunning = false; // Флаг для отслеживания состояния цикла игры
 
 // Устанавливаем правильное соотношение сторон для канваса
@@ -89,21 +90,6 @@ document.getElementById("leaderboardButton").addEventListener("click", function(
 
 document.getElementById("backButton").addEventListener("click", function() {
     document.getElementById("leaderboardScreen").style.display = "none";
-    document.getElementById("startScreen").style.display = "block";
-});
-
-document.getElementById("restartButton").addEventListener("click", function() {
-    document.getElementById("gameOverScreen").style.display = "none";
-    resetGame();
-    canvas.style.display = "block";
-    if (!gameLoopRunning) {
-        gameLoop();
-        gameLoopRunning = true;
-    }
-});
-
-document.getElementById("backToMenuButton").addEventListener("click", function() {
-    document.getElementById("gameOverScreen").style.display = "none";
     document.getElementById("startScreen").style.display = "block";
 });
 
@@ -257,6 +243,11 @@ function displayButtons() {
         canvas.style.display = "none";
         restartButton.remove();
         menuButton.remove();
+        // Останавливаем цикл игры
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            gameLoopRunning = false;
+        }
     };
 
     // Добавляем кнопки в DOM
@@ -265,6 +256,12 @@ function displayButtons() {
 }
 
 function resetGame() {
+    // Останавливаем предыдущий цикл анимации
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        gameLoopRunning = false;
+    }
+
     bird.y = 150;
     bird.velocity = 0;
     bird.gravity = 0.54;
@@ -274,8 +271,6 @@ function resetGame() {
     gameOver = false;
     showCollision = false;
     gameOverScreenShown = false;
-
-    gameLoopRunning = false; // Сбрасываем флаг цикла игры
 
     resizeCanvas(); // Обновляем размеры канваса
 
@@ -344,5 +339,6 @@ function gameLoop() {
     ctx.fillText("Score: " + score, canvas.width * 0.02, canvas.height * 0.02);
 
     frame++;
-    requestAnimationFrame(gameLoop);
+    // Сохраняем идентификатор анимации
+    animationFrameId = requestAnimationFrame(gameLoop);
 }
