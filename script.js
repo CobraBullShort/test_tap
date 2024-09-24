@@ -28,8 +28,8 @@ birdImage.src = 'bull.png'; // Укажите путь к вашему изоб�
 let bird = {
     x: 50,
     y: 150,
-    width: 100,   // Ширина птички 32 пикселя
-    height: 100,  // Высота птички 32 пикселя
+    width: 50,   
+    height: 50,  
     gravity: 0.54,
     lift: -9,
     velocity: 0
@@ -135,15 +135,18 @@ pipeImage.src = 'pipe.png'; // Укажите путь к вашему изоб�
 
 function drawPipes() {
     pipes.forEach(pipe => {
-        // Рисуем верхнюю трубу (перевернутая)
+        let topPipeHeight = pipe.topHeight;
+        let bottomPipeHeight = canvas.height - pipe.bottom - 50;
+
+        // Рисуем верхнюю трубу (перевернутую)
         ctx.save();
-        ctx.translate(pipe.x + pipe.width / 2, pipe.topHeight); // Перемещаем начало координат
-        ctx.scale(1, -1); // Отражаем по вертикали
-        ctx.drawImage(pipeImage, -pipe.width / 2, 0, pipe.width, pipe.topHeight);
+        ctx.translate(pipe.x + pipe.width / 2, pipe.topHeight);
+        ctx.scale(1, -1);
+        ctx.drawImage(pipeImage, -pipe.width / 2, 0, pipe.width, topPipeHeight);
         ctx.restore();
 
         // Рисуем нижнюю трубу
-        ctx.drawImage(pipeImage, pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom - 50);
+        ctx.drawImage(pipeImage, pipe.x, pipe.bottom, pipe.width, bottomPipeHeight);
     });
 }
 
@@ -151,9 +154,9 @@ function updatePipes() {
     const pipeInterval = 90 * 1.15;
 
     if (frame % Math.floor(pipeInterval) === 0) {
-        let gap = 150; // Увеличиваем зазор между трубами, если необходимо
+        let gap = 120; // Настройте зазор между трубами
         let topHeight = Math.floor(Math.random() * (canvas.height - gap - 50));
-        let pipeWidth = 100; // Ширина трубы соответствует ширине изображения
+        let pipeWidth = 80; // Увеличенная ширина трубы
 
         pipes.push({
             x: canvas.width,
@@ -178,11 +181,11 @@ function updatePipes() {
 function checkCollision() {
     for (let i = 0; i < pipes.length; i++) {
         if (
-            bird.x + bird.width - 15 > pipes[i].x &&   
-            bird.x + 15 < pipes[i].x + pipes[i].width &&
+            bird.x + bird.width - 5 > pipes[i].x &&
+            bird.x + 5 < pipes[i].x + pipes[i].width &&
             (
-                bird.y + 15 < pipes[i].topHeight ||
-                bird.y + bird.height - 15 > pipes[i].bottom
+                bird.y + 5 < pipes[i].topHeight ||
+                bird.y + bird.height - 5 > pipes[i].bottom
             )
         ) {
             showCollision = true;
