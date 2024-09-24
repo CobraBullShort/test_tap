@@ -21,15 +21,15 @@ function resizeCanvas() {
 resizeCanvas(); // Первоначальная адаптация
 window.addEventListener('resize', resizeCanvas); // Адаптация при изменении размеров окна
 
-// Загружаем изображение птички
+// Загружаем изображение быка
 const birdImage = new Image();
-birdImage.src = 'bird.png'; // Укажите путь к вашему изображению
+birdImage.src = 'bull.png'; // Укажите путь к вашему изображению
 
 let bird = {
     x: 50,
     y: 150,
-    width: 32,   // Ширина птички 32 пикселя
-    height: 32,  // Высота птички 32 пикселя
+    width: 100,   // Ширина птички 32 пикселя
+    height: 100,  // Высота птички 32 пикселя
     gravity: 0.54,
     lift: -9,
     velocity: 0
@@ -111,17 +111,17 @@ canvas.addEventListener("touchstart", function(event) {
 // Функции рисования и обновления игры
 function drawBird() {
     ctx.save();
-    ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
+    ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2); // Перемещаем точку вращения к центру быка
     let angle = 0;
 
     if (bird.velocity < 0) {
-        angle = -20 * Math.PI / 180;
+        angle = -20 * Math.PI / 180; // Поворачиваем вверх на 20 градусов
     } else if (bird.velocity > 0) {
-        angle = 20 * Math.PI / 180;
+        angle = 20 * Math.PI / 180; // Поворачиваем вниз на 20 градусов
     }
 
-    ctx.rotate(angle);
-    ctx.drawImage(birdImage, -bird.width / 2, -bird.height / 2, bird.width, bird.height);
+    ctx.rotate(angle); // Поворот канваса
+    ctx.drawImage(birdImage, -bird.width / 2, -bird.height / 2, bird.width, bird.height); // Отрисовываем быка
     ctx.restore();
 }
 
@@ -130,27 +130,38 @@ function drawGround() {
     ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
 }
 
+const pipeImage = new Image();
+pipeImage.src = 'pipe.png'; // Укажите путь к вашему изображению трубы
+
 function drawPipes() {
-    ctx.fillStyle = "green";
     pipes.forEach(pipe => {
-        ctx.fillRect(pipe.x, pipe.top, pipe.width, pipe.topHeight);
-        ctx.fillRect(pipe.x, pipe.bottom, pipe.width, pipe.bottomHeight);
+        // Рисуем верхнюю трубу (перевернутая)
+        ctx.save();
+        ctx.translate(pipe.x + pipe.width / 2, pipe.topHeight); // Перемещаем начало координат
+        ctx.scale(1, -1); // Отражаем по вертикали
+        ctx.drawImage(pipeImage, -pipe.width / 2, 0, pipe.width, pipe.topHeight);
+        ctx.restore();
+
+        // Рисуем нижнюю трубу
+        ctx.drawImage(pipeImage, pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom - 50);
     });
 }
 
 function updatePipes() {
     const pipeInterval = 90 * 1.15;
-    
+
     if (frame % Math.floor(pipeInterval) === 0) {
-        let gap = 105;
+        let gap = 150; // Увеличиваем зазор между трубами, если необходимо
         let topHeight = Math.floor(Math.random() * (canvas.height - gap - 50));
+        let pipeWidth = 100; // Ширина трубы соответствует ширине изображения
+
         pipes.push({
             x: canvas.width,
             top: 0,
             topHeight: topHeight,
             bottom: topHeight + gap,
             bottomHeight: canvas.height - topHeight - gap - 50,
-            width: 20
+            width: pipeWidth
         });
     }
 
@@ -167,11 +178,11 @@ function updatePipes() {
 function checkCollision() {
     for (let i = 0; i < pipes.length; i++) {
         if (
-            bird.x + bird.width - 5 > pipes[i].x &&
-            bird.x + 5 < pipes[i].x + pipes[i].width &&
+            bird.x + bird.width - 15 > pipes[i].x &&   
+            bird.x + 15 < pipes[i].x + pipes[i].width &&
             (
-                bird.y + 5 < pipes[i].topHeight ||
-                bird.y + bird.height - 5 > pipes[i].bottom
+                bird.y + 15 < pipes[i].topHeight ||
+                bird.y + bird.height - 15 > pipes[i].bottom
             )
         ) {
             showCollision = true;
@@ -180,7 +191,7 @@ function checkCollision() {
         }
     }
 
-    if (bird.y + bird.height >= canvas.height - 50) {
+    if (bird.y + bird.height >= canvas.height - 50) { // Быка касается земли
         showCollision = true;
         endGame();
     }
